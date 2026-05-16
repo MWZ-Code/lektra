@@ -12,7 +12,7 @@ namespace AppPaths
 {
 
 #if defined(__APPLE__) && defined(__MACH__)
-QString
+static QString
 bundleResourcesPath() noexcept
 {
     const QDir appDir(QCoreApplication::applicationDirPath());
