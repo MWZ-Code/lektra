@@ -10,9 +10,13 @@
 #include <qcoreapplication.h>
 #include <signal.h>
 
-#ifdef linux
+#if defined(linux) || defined(__APPLE__)
     #include <sys/resource.h>
     #include <unistd.h>
+    #ifdef __APPLE__
+        #include <limits.h>
+        #include <mach-o/dyld.h>
+    #endif
 #elif _WIN32
     #define WIN32_LEAN_AND_MEAN
     #include <Windows.h>
@@ -20,16 +24,23 @@
     #include <vector>
 #endif
 
-#ifdef linux
+#if defined(linux) || defined(__APPLE__)
 static std::string
 get_self_executable_path()
 {
     char buf[PATH_MAX + 1];
-    const ssize_t n = ::readlink("/proc/self/exe", buf, PATH_MAX);
-    if (n <= 0)
-        return std::string{};
-    buf[n] = '\0';
-    return std::string(buf);
+    #ifdef __APPLE__
+        uint32_t size = sizeof(buf);
+        if (_NSGetExecutablePath(buf, &size) != 0)
+            return std::string{};
+        return std::string(buf);
+    #else
+        const ssize_t n = ::readlink("/proc/self/exe", buf, PATH_MAX);
+        if (n <= 0)
+            return std::string{};
+        buf[n] = '\0';
+        return std::string(buf);
+    #endif
 }
 
 static void
