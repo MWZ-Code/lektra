@@ -1,41 +1,58 @@
+# locked: false
 name: Feature Request
-description: Suggest a new feature or enhancement.
+description: Suggest a new feature or enhancement
+title: "[Feature]: "
 labels: ["enhancement"]
 body:
   - type: checkboxes
-    id: searched
+    id: duplicate-check
     attributes:
-      label: Searched existing issues
-      description: Search existing issues to avoid duplicates.
+      label: Pre-submission checklist
       options:
-        - label: I have searched existing issues for duplicates.
+        - label: I have searched existing issues to ensure this feature has not already been requested.
           required: true
-
-  - type: checkboxes
-    id: willing
-    attributes:
-      label: Willing to contribute
-      options:
-        - label: I am willing to submit a pull request for this.
-          required: false
 
   - type: textarea
     id: problem
     attributes:
-      label: Problem
+      label: Problem Statement
+      description: What problem does this feature solve? Why is it needed?
+      placeholder: Describe the problem or motivation...
     validations:
       required: true
 
   - type: textarea
-    id: proposal
+    id: proposed-solution
     attributes:
-      label: Proposed solution
+      label: Proposed Solution
+      description: Describe the solution you'd like to see.
+      placeholder: Describe your ideal solution...
     validations:
       required: true
 
   - type: textarea
     id: alternatives
     attributes:
-      label: Alternatives considered
+      label: Alternatives Considered
+      description: Have you considered any alternative solutions or workarounds?
+      placeholder: Describe alternatives you've thought about...
+    validations:
+      required: false
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: Optional. Define what success looks like for this feature.
+      placeholder: |
+        - [ ] ...
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other context, screenshots, or references for this feature.
     validations:
       required: false
