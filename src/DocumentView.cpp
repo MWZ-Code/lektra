@@ -25,6 +25,7 @@
 #include "utils.hpp"
 
 #include <QClipboard>
+#include <QColorDialog>
 #include <QDesktopServices>
 #include <QFileDialog>
 #include <QFontMetricsF>
@@ -3300,17 +3301,24 @@ DocumentView::handleContextMenuRequested(const QPoint &globalPos,
         // TODO: Put this under a undo command
         addAction(tr("Change Color"), [this, selectedAnnots]()
         {
-            ColorDialog cp(m_config.misc.color_dialog_colors, this);
-            cp.setWindowTitle(tr("Select Annotation Color"));
+            const int customSlots = QColorDialog::customCount();
+            const int n           = std::min(customSlots,
+                                       static_cast<int>(m_config.misc.color_dialog_colors.size()));
+            for (int i = 0; i < n; ++i)
+                QColorDialog::setCustomColor(i, m_config.misc.color_dialog_colors[i]);
 
-            if (cp.exec() == QDialog::Accepted)
+            QColor initial = !selectedAnnots.empty()
+                                 ? selectedAnnots.front().second->color()
+                                 : QColor(Qt::yellow);
+
+            QColor c = QColorDialog::getColor(
+                initial, this, tr("Select Annotation Color"),
+                QColorDialog::ShowAlphaChannel);
+
+            if (c.isValid())
             {
-                QColor c = cp.selectedColor();
-                if (c.isValid())
-                {
-                    for (const auto &[pageno, annot] : selectedAnnots)
-                        m_model->annotChangeColor(pageno, annot->index(), c);
-                }
+                for (const auto &[pageno, annot] : selectedAnnots)
+                    m_model->annotChangeColor(pageno, annot->index(), c);
             }
         });
         hasActions = true;
@@ -3867,19 +3875,23 @@ DocumentView::renderAnnotations(
         connect(annot_item, &Annotation::annotColorChangeRequested, this,
                 [this, annot_item, pageno]()
         {
-            ColorDialog colorDialog(m_config.misc.color_dialog_colors, this);
-            QColor oldColor = annot_item->color();
-            colorDialog.setWindowTitle(tr("Select Annotation Color"));
+            const int customSlots = QColorDialog::customCount();
+            const int n           = std::min(customSlots,
+                                       static_cast<int>(m_config.misc.color_dialog_colors.size()));
+            for (int i = 0; i < n; ++i)
+                QColorDialog::setCustomColor(i, m_config.misc.color_dialog_colors[i]);
 
-            if (colorDialog.exec() == QDialog::Accepted)
+            QColor oldColor = annot_item->color();
+            QColor newColor = QColorDialog::getColor(
+                oldColor.isValid() ? oldColor : QColor(Qt::yellow),
+                this, tr("Select Annotation Color"),
+                QColorDialog::ShowAlphaChannel);
+
+            if (newColor.isValid())
             {
-                QColor newColor = colorDialog.selectedColor();
-                if (newColor.isValid())
-                {
-                    m_model->undoStack()->push(new AnnotColorCommand(
-                        m_model, pageno, annot_item->index(), oldColor,
-                        newColor));
-                }
+                m_model->undoStack()->push(new AnnotColorCommand(
+                    m_model, pageno, annot_item->index(), oldColor,
+                    newColor));
             }
         });
 
