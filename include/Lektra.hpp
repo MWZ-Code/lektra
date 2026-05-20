@@ -282,6 +282,7 @@ private:
     void setSessionName(const QString &name) noexcept;
     void openSessionFromArray(const QJsonArray &sessionArray) noexcept;
     void modeColorChangeRequested(const GraphicsView::Mode mode) noexcept;
+    void seedColorDialogCustomColors() noexcept;
     void handleEscapeKeyPressed() noexcept;
     void showTutorialFile() noexcept;
     void setMark(const QString &key, const int pageno,

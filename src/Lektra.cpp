@@ -4960,26 +4960,44 @@ Lektra::openSessionFromArray(const QJsonArray &sessionArray) noexcept
 }
 
 void
+Lektra::seedColorDialogCustomColors() noexcept
+{
+    const int customSlots = QColorDialog::customCount();
+    const int n           = std::min(customSlots,
+                           static_cast<int>(m_config.misc.color_dialog_colors.size()));
+    for (int i = 0; i < n; ++i)
+        QColorDialog::setCustomColor(i, m_config.misc.color_dialog_colors[i]);
+}
+
+void
 Lektra::modeColorChangeRequested(const GraphicsView::Mode mode) noexcept
 {
-    ColorDialog colorDialog(m_config.misc.color_dialog_colors, this);
-    colorDialog.setWindowTitle(tr("Select Color"));
+    seedColorDialogCustomColors();
 
-    if (colorDialog.exec() == QDialog::Accepted)
-    {
-        QColor color = colorDialog.selectedColor();
-        auto model   = m_doc->model();
-        if (mode == GraphicsView::Mode::AnnotRect)
-            model->setAnnotRectColor(color);
-        else if (mode == GraphicsView::Mode::TextHighlight)
-            model->setHighlightColor(color);
-        else if (mode == GraphicsView::Mode::TextSelection)
-            model->setSelectionColor(color);
-        else if (mode == GraphicsView::Mode::AnnotPopup)
-            model->setPopupColor(color);
+    QColor initial;
+    auto model = m_doc->model();
+    if (mode == GraphicsView::Mode::TextHighlight)
+        initial = model->highlightAnnotColor();
+    if (!initial.isValid())
+        initial = Qt::yellow;
 
-        m_statusbar->setHighlightColor(color);
-    }
+    QColor color = QColorDialog::getColor(
+        initial, this, tr("Select Color"),
+        QColorDialog::ShowAlphaChannel | QColorDialog::DontUseNativeDialog);
+
+    if (!color.isValid())
+        return; // user cancelled
+
+    if (mode == GraphicsView::Mode::AnnotRect)
+        model->setAnnotRectColor(color);
+    else if (mode == GraphicsView::Mode::TextHighlight)
+        model->setHighlightColor(color);
+    else if (mode == GraphicsView::Mode::TextSelection)
+        model->setSelectionColor(color);
+    else if (mode == GraphicsView::Mode::AnnotPopup)
+        model->setPopupColor(color);
+
+    m_statusbar->setHighlightColor(color);
 }
 
 void
