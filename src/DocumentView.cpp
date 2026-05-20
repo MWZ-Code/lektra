@@ -3313,7 +3313,7 @@ DocumentView::handleContextMenuRequested(const QPoint &globalPos,
 
             QColor c = QColorDialog::getColor(
                 initial, this, tr("Select Annotation Color"),
-                QColorDialog::ShowAlphaChannel);
+                QColorDialog::ShowAlphaChannel | QColorDialog::DontUseNativeDialog);
 
             if (c.isValid())
             {
@@ -3885,7 +3885,7 @@ DocumentView::renderAnnotations(
             QColor newColor = QColorDialog::getColor(
                 oldColor.isValid() ? oldColor : QColor(Qt::yellow),
                 this, tr("Select Annotation Color"),
-                QColorDialog::ShowAlphaChannel);
+                QColorDialog::ShowAlphaChannel | QColorDialog::DontUseNativeDialog);
 
             if (newColor.isValid())
             {

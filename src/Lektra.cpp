@@ -4983,7 +4983,7 @@ Lektra::modeColorChangeRequested(const GraphicsView::Mode mode) noexcept
 
     QColor color = QColorDialog::getColor(
         initial, this, tr("Select Color"),
-        QColorDialog::ShowAlphaChannel);
+        QColorDialog::ShowAlphaChannel | QColorDialog::DontUseNativeDialog);
 
     if (!color.isValid())
         return; // user cancelled
